@@ -1,8 +1,3 @@
-ADME 
-
-Thursday, August 7, 2025
-6:48 PM
-
 
 I have built a modern, responsive E-Commerce web application using React, Redux Toolkit, Firebase Authentication, and Firestore as the backend. This project replaces FakeStoreAPI with full Firestore CRUD functionality, while sessionStorage is used to persist cart data across sessions.
 
