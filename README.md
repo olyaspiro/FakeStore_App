@@ -33,4 +33,4 @@ Final Touches:
 - I have installed and configured all necessary dependencies.
 - All features are fully tested.
 - The app is responsive across all screen sizes using a combination of Bootstrap and custom CSS.
-- All user data and product inventory handled via Firebase<img width="942" height="1069" alt="image" src="https://github.com/user-attachments/assets/f713ceaf-7be3-48d6-964c-ab0a598d7e7d" />
+- All user data and product inventory handled via Firebase.
