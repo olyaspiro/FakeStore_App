@@ -1,17 +1,21 @@
-// App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./components/Home";
+import Home from "./pages/Home";
 import ProductList from "./components/ProductList";
 import ProductDetails from "./components/ProductDetails";
-import AddProduct from "./components/AddProduct"; 
+import AddProduct from "./components/AddProduct";
 import EditProduct from "./components/EditProduct";
-import NavBar from "./components/NavBar";
+import Register from "./pages/Register";    
+import Login from "./pages/Login";           
+import Profile from "./pages/Profile";          
+import NavigationBar from "./components/NavBar";
+import CartPage from "./pages/CartPage";
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
     <Router>
-      <NavBar />
+      <NavigationBar />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -19,6 +23,10 @@ function App() {
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/add-product" element={<AddProduct />} />
           <Route path="/products/:id/edit" element={<EditProduct />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<Profile />} />
+            <Route path="/cart" element={<CartPage />} />
         </Routes>
       </main>
       <footer>© 2025 My Store</footer>
@@ -27,5 +35,3 @@ function App() {
 }
 
 export default App;
-
-

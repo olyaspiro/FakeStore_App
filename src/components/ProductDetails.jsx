@@ -1,47 +1,58 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Container, Card, Button, Spinner, Modal } from "react-bootstrap";
+import { Container, Card, Button, Spinner, Modal, Alert } from "react-bootstrap";
+import { doc, getDoc, deleteDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../cartSlice";
 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`https://fakestoreapi.com/products/${id}`)
-      .then((response) => {
-        setProduct(response.data);
-        setLoading(false);
-      })
-      .catch(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const docRef = doc(db, "products", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setProduct({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          setError("Product not found.");
+        }
+      } catch {
         setError("Failed to fetch product details.");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchProduct();
   }, [id]);
 
   const handleAddToCart = () => {
-    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-    const updatedCart = [...existingCart, product];
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    alert(`${product.title} has been added to your cart!`);
-    navigate("/products");
+    dispatch(addToCart(product));
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 2000);
   };
 
-  const handleDelete = () => {
-    axios
-      .delete(`https://fakestoreapi.com/products/${id}`)
-      .then(() => {
-        alert("Product deleted successfully!");
-        navigate("/products");
-      })
-      .catch(() => {
-        alert("Failed to delete product.");
-      });
+  const handleDelete = async () => {
+    try {
+      await deleteDoc(doc(db, "products", id));
+      alert("Product deleted successfully!");
+      navigate("/products");
+    } catch {
+      alert("Failed to delete product.");
+    }
   };
 
   const handleShowModal = () => setShowModal(true);
@@ -52,7 +63,15 @@ function ProductDetails() {
 
   return (
     <Container className="mt-5" style={{ paddingTop: "60px" }}>
-      <Card className="shadow-sm product-details-card" style={{ maxWidth: "500px", margin: "auto", marginTop: "30px" }}>
+      {showAlert && (
+        <Alert variant="success" className="text-center">
+          ✅ {product.title} has been added to your cart!
+        </Alert>
+      )}
+      <Card
+        className="shadow-sm product-details-card"
+        style={{ maxWidth: "500px", margin: "auto", marginTop: "30px" }}
+      >
         <Card.Img
           variant="top"
           src={product.image}
@@ -70,16 +89,14 @@ function ProductDetails() {
           <Card.Text>
             <strong>Category:</strong> {product.category}
           </Card.Text>
-
           <div className="d-flex justify-content-center">
-            <Button variant="success" className="me-2" onClick={handleAddToCart}>
+            <Button variant="dark" className="me-2" onClick={handleAddToCart}>
               Add to Cart
             </Button>
             <Button variant="danger" onClick={handleShowModal}>
               Delete Product
             </Button>
           </div>
-
           <Link to={`/products/${id}/edit`} className="mt-3 d-block text-center">
             <Button variant="warning">Edit Product</Button>
           </Link>
@@ -113,3 +130,4 @@ function ProductDetails() {
 }
 
 export default ProductDetails;
+
